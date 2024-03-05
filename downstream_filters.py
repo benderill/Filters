@@ -161,7 +161,7 @@ def savetocsv(df : pd.DataFrame ,path : str ,elems : list):
     df.to_csv(path/filename)
 
 def create_df(df : pd.DataFrame ,elems : list, path : str, max_mpid_range : pd. Series, min_mpid_range : pd.Series,
-               stoichimetric_ratios : pd.DataFrame, matches : pd.Series):
+               stoichimetric_ratios : pd.DataFrame, interstate : pd.Series):
     """
     Creates a DataFrame with additional columns based on the input parameters.
 
@@ -179,20 +179,20 @@ def create_df(df : pd.DataFrame ,elems : list, path : str, max_mpid_range : pd. 
     """
     if max_mpid_range is None:
         df = addtodf(df, 'Stoich x/y x/z x/z ', stoichimetric_ratios.transpose().values.tolist())
-        df = addtodf(df, 'Max mpid range', None)
-        df = addtodf(df, 'Min mpid range', None)
-        df = addtodf(df, 'In range', None)
-        df = addtodf(df, 'Make', None)
-        df = addtodf(df, 'Matches', None)
+        df = addtodf(df, 'Max mpid range', 'NO Existing Compound')
+        df = addtodf(df, 'Min mpid range', 'NO Existing Compound')
+        df = addtodf(df, 'In range', 'NO Existing Compound')
+        df = addtodf(df, 'Intrastate','NO Existing Compound')
+        df = addtodf(df, 'Interstate',interstate)
     else:
         max_range, min_range, candidates_in_range = in_range(max_mpid_range, min_mpid_range, stoichimetric_ratios)
-        make = truefalse(candidates_in_range)
+        intrastate = truefalse(candidates_in_range)
         df = addtodf(df, 'Stoich x/y x/z x/z ', stoichimetric_ratios.transpose().values.tolist())
         df = addtodf(df, 'Max mpid range', max_range.transpose().tolist())
         df = addtodf(df, 'Min mpid range', min_range.transpose().tolist())
         df = addtodf(df, 'In range', candidates_in_range.transpose().values.tolist())
-        df = addtodf(df, 'Make', make)
-        df = addtodf(df, 'Matches', matches)
+        df = addtodf(df, 'Intrastate', intrastate)
+        df = addtodf(df, 'Interstate', interstate )
     savetocsv(df, path, elems)
 
 def stoichiometry_main(df : pd.DataFrame, path : str, elems : list ,stoichimetric_spread : float,stoichiometry : list):
@@ -209,11 +209,11 @@ def stoichiometry_main(df : pd.DataFrame, path : str, elems : list ,stoichimetri
     Returns:
     tuple: A tuple containing two pandas.DataFrames - the updated DataFrame and the 'Atoms' column of df_mpid.
     """
-    matches = match_stoichimetric_combinations(stoichiometry,df)
+    interstate = match_stoichimetric_combinations(stoichiometry,df)
     df_mpid = mpid(df)
     max_mpid_range, min_mpid_range = mpid_range(df_mpid,stoichimetric_spread)
     stoichimetric_ratios = stoich_ratio(df)
-    create_df(df,elems, path, max_mpid_range, min_mpid_range, stoichimetric_ratios,matches)
+    create_df(df,elems, path, max_mpid_range, min_mpid_range, stoichimetric_ratios,interstate)
     return df, df_mpid['Atoms']
     
 

@@ -34,14 +34,14 @@ combinations = pd.Series(itertools.product(A, B, X))
 filtered_combinations = ([combination for combination in combinations if combination[:][1] != combination[:][2]])
 idx = len(filtered_combinations)
 
-df_combined = pd.DataFrame(['composition','Atoms','reduced_formula','mp-id', 'icsd_id', 'Make', 'Matches'])
+df_combined = pd.DataFrame(['composition','Atoms','reduced_formula','mp-id', 'icsd_id', 'Intrastate', 'Interstate'])
 df_mpid_all = []
 for i in range(idx):
     elems = (filtered_combinations[i])
     num = len(elems)        # number of elements in the compound
     df = filter(elems, charge_mixing, num, charge_frequency, path)
     df, df_mpid = downstream_filters.stoichiometry_main(df, path, elems,stoichimetric_spread,stoichiometry)
-    df_subset = df[['composition','Atoms','reduced_formula','mp-id', 'icsd_id', 'Make', 'Matches']].copy()
+    df_subset = df[['composition','Atoms','reduced_formula','mp-id', 'icsd_id', 'Intrastate', 'Interstate']].copy()
     df_combined = pd.concat([df_subset, df_combined], ignore_index=True)
     data_analysis.main(df,elems, path)
     #df_mpid_all.append(df_mpid) 

@@ -12,8 +12,8 @@ import plotly.graph_objects as go
 def data(df):
     formula = df['reduced_formula']
     stoichiometry = df['Atoms']
-    matches = df['Matches']
-    make = df['Make']
+    matches = df['Interstate']
+    make = df['Intrastate']
     mpid = df['mp-id']
     return formula, stoichiometry, matches, make, mpid
 
@@ -63,9 +63,9 @@ def plot(df, elems, path):
     del hover_name['index']
 
     df_mp['Materials'] = 'Pre-existing'
-    df_match['Materials'] = 'Missing Known Stoichiometry'
-    df_make['Materials'] = 'Materials within range'
-    df_rest['Materials'] = 'New Materials which cannot be made'
+    df_match['Materials'] = 'Interstate : Missing known stoichiometry' #'Mateials with Stoichiometry that matches with existing stoichiometry in other state space'
+    df_make['Materials'] = 'Intrastate : Might form' #'Materials within range of existing stoichiometry of current state space'
+    df_rest['Materials'] = 'New Materials which probably cannot be made'
     
 
     
@@ -91,9 +91,10 @@ def plot(df, elems, path):
     fig = px.scatter_ternary(df_all, a = corners[0], b = corners[1], c = corners[2],
                             symbol = df_all['Materials'],
                             color = df_all['Materials'],
-                            symbol_sequence= symbols,
+                            #size=pd.Series([2]*len(df_all)),
+                            #symbol_sequence= symbols,
                             color_discrete_sequence = colors,
-                            width=600, height=400,
+                            width=800, height=600,
                             hover_name=df_all['hover_name'],
                             hover_data={corners[0]:False,
                                         corners[1]:False,
@@ -102,8 +103,10 @@ def plot(df, elems, path):
                             title=("Ternary compositions of : %s" % corners[0]+corners[1]+corners[2])
                             )
     
-
-    
+    #fig.update_traces(marker={'size': 10})
+    #fig.update_ternaries(aaxis=dict(min=0), sum = 100)
+    #fig.update_layout(legend=dict(x=1))
+        
     fig.update_layout({
     'ternary': {
         'sum': 100,
